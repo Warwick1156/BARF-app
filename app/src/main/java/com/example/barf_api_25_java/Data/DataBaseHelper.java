@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.example.barf_api_25_java.Foods.Component;
+import com.example.barf_api_25_java.Foods.ComponentType;
 import com.example.barf_api_25_java.Foods.Food;
 
 import java.io.File;
@@ -32,8 +33,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         String path = DB_PATH + DB_NAME;
         if (checkFileExistence(path)) {
             openDataBase();
-        }
-        else {
+        } else {
             copyDatabase();
         }
     }
@@ -49,21 +49,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public void copyDatabase() throws IOException {
-        InputStream inputStream = context.getAssets().open(DB_NAME);
-        String path = DB_PATH + DB_NAME;
+        try(InputStream inputStream = context.getAssets().open(DB_NAME)) {
+            String path = DB_PATH + DB_NAME;
 
-        File file = new File(path);
-        file.getParentFile().mkdirs();
-        OutputStream outputStream = new FileOutputStream(path, false);
+            File file = new File(path);
+            file.getParentFile().mkdirs();
 
-        byte[] buffer = new byte[1024];
-        while (inputStream.read(buffer) > 0) {
-            outputStream.write(buffer);
+            try(OutputStream outputStream = new FileOutputStream(path, false)) {
+                byte[] buffer = new byte[1024];
+                while (inputStream.read(buffer) > 0) {
+                    outputStream.write(buffer);
+                }
+
+                outputStream.flush();
+
+            }
         }
-
-        outputStream.flush();
-        outputStream.close();
-        inputStream.close();
     }
 
     public boolean checkFileExistence(String path) {
@@ -107,15 +108,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 String foodType = cursor.getString(2);
 
                 for (int i = 3; i < cursor.getColumnCount(); i++) {
-                    Component.Id id = Component.getId(cursor.getColumnName(i));
+                    ComponentType id = Component.getId(cursor.getColumnName(i));
                     float value = cursor.getFloat(i);
 
                     Component component = new Component(id, value);
                     componentList.add(component);
                 }
 
-                Food food = new Food(foodName, foodAnimal, foodType, componentList);
-                foodList.add(food);
+//                Food food = new Food(foodName, foodAnimal, foodType, componentList);
+//                foodList.add(food);
             } while (cursor.moveToNext());
         }
         cursor.close();

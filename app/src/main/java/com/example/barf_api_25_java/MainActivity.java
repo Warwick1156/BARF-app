@@ -1,17 +1,16 @@
 package com.example.barf_api_25_java;
 
 import android.os.Bundle;
-
-import com.example.barf_api_25_java.Data.DataBaseHelper;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import com.example.barf_api_25_java.Data.DataBaseHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 
