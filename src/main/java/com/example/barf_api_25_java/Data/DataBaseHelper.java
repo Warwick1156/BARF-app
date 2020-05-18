@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.example.barf_api_25_java.Foods.Component;
+import com.example.barf_api_25_java.Foods.ComponentType;
 import com.example.barf_api_25_java.Foods.Food;
+import com.example.barf_api_25_java.Foods.FoodType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -104,17 +106,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 List<Component> componentList = new ArrayList<>();
                 String foodName = cursor.getString(0);
                 String foodAnimal = cursor.getString(1);
-                String foodType = cursor.getString(2);
+                FoodType foodType = FoodType.valueOf(cursor.getString(2).toUpperCase());
+                float foodPortion = cursor.getFloat(3);
+                float foodBones = cursor.getFloat(4);
 
-                for (int i = 3; i < cursor.getColumnCount(); i++) {
-                    Component.Id id = Component.getId(cursor.getColumnName(i));
+                for (int i = 5; i < cursor.getColumnCount(); i++) {
+                    ComponentType id = Component.get_Id(cursor.getColumnName(i));
                     float value = cursor.getFloat(i);
 
                     Component component = new Component(id, value);
                     componentList.add(component);
                 }
 
-                Food food = new Food(foodName, foodAnimal, foodType, componentList);
+                Food food = new Food(foodName, foodAnimal, foodType, foodPortion, foodBones, componentList);
                 foodList.add(food);
             } while (cursor.moveToNext());
         }

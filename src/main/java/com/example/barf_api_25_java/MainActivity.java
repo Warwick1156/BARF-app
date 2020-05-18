@@ -3,6 +3,8 @@ package com.example.barf_api_25_java;
 import android.os.Bundle;
 
 import com.example.barf_api_25_java.Data.DataBaseHelper;
+import com.example.barf_api_25_java.Foods.Food;
+import com.example.barf_api_25_java.Foods.Meal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-            dataBaseHelper.getFoods("", "");
+            List<Food> foodList = dataBaseHelper.getFoods("", "");
+            Meal meal = new Meal(600);
+            meal.createMeal(foodList);
         } catch (IOException e) {
             e.printStackTrace();
         }
