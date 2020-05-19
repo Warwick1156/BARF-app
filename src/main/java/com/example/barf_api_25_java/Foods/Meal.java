@@ -1,6 +1,8 @@
 package com.example.barf_api_25_java.Foods;
 
 import com.example.barf_api_25_java.Settings.MealProportions;
+import com.example.barf_api_25_java.Types.ComponentType;
+import com.example.barf_api_25_java.Types.FoodType;
 import com.example.barf_api_25_java.Utils.ApproximateItem;
 
 import java.util.ArrayList;

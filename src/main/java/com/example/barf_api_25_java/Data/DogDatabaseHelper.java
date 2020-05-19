@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import com.example.barf_api_25_java.Foods.BreedType;
+import com.example.barf_api_25_java.Types.ActivityType;
+import com.example.barf_api_25_java.Types.BreedType;
 
 import java.io.IOException;
 import java.util.ArrayList;

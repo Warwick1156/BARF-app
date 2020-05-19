@@ -1,4 +1,4 @@
-package com.example.barf_api_25_java.Foods;
+package com.example.barf_api_25_java.Types;
 
 public enum ComponentType {
     ENERGY, PROTEIN, FAT, CALCIUM, PHOSPHORUS, POTASSIUM, SODIUM, MAGNESIUM, COPPER, IRON,

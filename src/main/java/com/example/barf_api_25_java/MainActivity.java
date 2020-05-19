@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
             //meal.createMeal(foodList);
             MealPlan mealPlan = new MealPlan(7, 500, foodList);
             mealPlan.createMealPlan();
+            List<Meal> mealList = mealPlan.getMealList();
+            System.out.println("");
         } catch (IOException e) {
             e.printStackTrace();
         }

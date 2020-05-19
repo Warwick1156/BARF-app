@@ -1,5 +1,7 @@
 package com.example.barf_api_25_java.Foods;
 
+import com.example.barf_api_25_java.Types.ComponentType;
+
 public class Component {
     private ComponentType id;
     private float value;

@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.example.barf_api_25_java.Foods.Component;
-import com.example.barf_api_25_java.Foods.ComponentType;
+import com.example.barf_api_25_java.Types.ComponentType;
 import com.example.barf_api_25_java.Foods.Food;
-import com.example.barf_api_25_java.Foods.FoodType;
+import com.example.barf_api_25_java.Types.FoodType;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -26,4 +26,8 @@ public class MealPlan {
             mealList.add(meal);
         }
     }
+
+    public List<Meal> getMealList() {
+        return mealList;
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.barf_api_25_java.Data;
 
-import com.example.barf_api_25_java.Foods.BreedType;
+import com.example.barf_api_25_java.Types.ActivityType;
+import com.example.barf_api_25_java.Types.BreedType;
 
 public class Dog {
     int age;

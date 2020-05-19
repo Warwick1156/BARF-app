@@ -1,5 +1,7 @@
 package com.example.barf_api_25_java.Foods;
 
+import com.example.barf_api_25_java.Types.FoodType;
+
 import java.util.List;
 
 public class Food {
