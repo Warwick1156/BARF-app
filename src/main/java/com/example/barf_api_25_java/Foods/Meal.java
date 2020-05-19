@@ -26,11 +26,17 @@ public class Meal {
     public Meal(int targetWeight) {
         this.targetWeight = targetWeight;
         this.foodProportions = new MealProportions().getProportions();
+        mealCategoryTargetWeights = splitTotalWeight(foodProportions, targetWeight);
     }
 
     public Meal(int targetWeight, EnumMap<FoodType, Float> foodProportions) {
         this.targetWeight = targetWeight;
         this.foodProportions = foodProportions;
+        mealCategoryTargetWeights = splitTotalWeight(foodProportions, targetWeight);
+    }
+
+    public Meal(EnumMap<FoodType, Float> mealCategoryTargetWeights) {
+        this.mealCategoryTargetWeights = mealCategoryTargetWeights;
     }
 
     public Meal() {
@@ -46,18 +52,16 @@ public class Meal {
     }
 
     public void createMeal(List<Food> foodList) {
-        mealCategoryTargetWeights = splitTotalWeight(foodProportions);
         EnumMap<FoodType, List<Food>> foodMap = separateCategories(foodList);
-
         mealFoods = chooseFoods(foodMap, mealCategoryTargetWeights);
         calculateTotals();
         calculateError();
     }
 
-    private EnumMap splitTotalWeight(EnumMap<FoodType, Float> proportions) {
+    public EnumMap splitTotalWeight(EnumMap<FoodType, Float> proportions, int target) {
         EnumMap<FoodType, Float> splited = new EnumMap<FoodType, Float>(FoodType.class);
         for (FoodType type : FoodType.values()) {
-            float value = targetWeight * proportions.get(type).floatValue();
+            float value = target * proportions.get(type).floatValue();
             Float newValue = new Float(value);
             splited.put(type, newValue);
         }
@@ -78,14 +82,15 @@ public class Meal {
         return separated;
     }
 
-    private HashMap<Food, Integer> chooseFoods(EnumMap<FoodType, List<Food>> foods, EnumMap<FoodType, Float> constraints) {
+    private HashMap<Food, Integer> chooseFoods(EnumMap<FoodType, List<Food>> foods, EnumMap<FoodType, Float> globalConstraints) {
         List<HashMap<Food, Integer>> result = new ArrayList<>();
+        EnumMap<FoodType, Float> localConstraints = globalConstraints.clone();
         for (FoodType type : FoodType.values()) {
-            HashMap<Food, Integer> partResult = knapsack_approximate(foods.get(type), null, constraints.get(type), type);
+            HashMap<Food, Integer> partResult = knapsack_approximate(foods.get(type), null, localConstraints.get(type), type);
             result.add(partResult);
             if (type.equals(FoodType.BONE)) {
                 List<Food> separated = separateMeatFromBone(partResult);
-                constraints = correctMeatConstrains(separated, constraints);
+                localConstraints = correctMeatConstrains(separated, localConstraints);
             }
         }
 

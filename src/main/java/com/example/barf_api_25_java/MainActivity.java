@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.example.barf_api_25_java.Data.DataBaseHelper;
 import com.example.barf_api_25_java.Foods.Food;
 import com.example.barf_api_25_java.Foods.Meal;
+import com.example.barf_api_25_java.Foods.MealPlan;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -39,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
             List<Food> foodList = dataBaseHelper.getFoods("", "");
-            Meal meal = new Meal(600);
-            meal.createMeal(foodList);
+            //Meal meal = new Meal(600);
+            //meal.createMeal(foodList);
+            MealPlan mealPlan = new MealPlan(7, 500, foodList);
+            mealPlan.createMealPlan();
         } catch (IOException e) {
             e.printStackTrace();
         }
