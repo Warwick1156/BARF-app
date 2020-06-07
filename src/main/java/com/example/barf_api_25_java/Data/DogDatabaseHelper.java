@@ -40,7 +40,7 @@ public class DogDatabaseHelper extends DataBaseHelper {
 
     public void removeDog(Dog dog) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("DOG", "name=" + dog.getDogName(), null);
+        db.delete("DOG", "id=" + dog.getId(), null);
         db.close();
     }
 
@@ -48,16 +48,23 @@ public class DogDatabaseHelper extends DataBaseHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Dog> dogs = new ArrayList<>();
 
-        Cursor cursor = db.query("DOG", null, "name=" + name, null, null, null, null);
+        Cursor cursor;
+        if (name == null) {
+            cursor = db.rawQuery("SELECT * FROM DOG", null);
+        } else {
+            cursor = db.query("DOG", null, "name=" + name, null, null, null, null);
+        }
         if (cursor.moveToFirst()) {
             do {
-                String dogName = cursor.getString(0);
-                int dogAge = cursor.getInt(1);
-                float dogWeight = cursor.getFloat(2);
-                BreedType dogBreedType = BreedType.valueOf(cursor.getString(3).toUpperCase());
-                ActivityType dogActivityType = ActivityType.valueOf(cursor.getString(4).toUpperCase());
+                int id = cursor.getInt(0);
+                String dogName = cursor.getString(1);
+                int dogAge = cursor.getInt(2);
+                float dogWeight = cursor.getFloat(3);
+                BreedType dogBreedType = BreedType.valueOf(cursor.getString(4).toUpperCase());
+                ActivityType dogActivityType = ActivityType.valueOf(cursor.getString(5).toUpperCase());
+                String stringImage = cursor.getString(6);
 
-                Dog dog = new Dog(dogAge, dogWeight, dogName, dogActivityType, dogBreedType);
+                Dog dog = new Dog(id, dogAge, dogWeight, dogName, dogActivityType, dogBreedType, stringImage);
                 dogs.add(dog);
             } while (cursor.moveToNext());
         }
