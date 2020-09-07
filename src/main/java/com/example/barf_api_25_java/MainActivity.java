@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> names = new ArrayList<>();
     private ArrayList<byte[]> images = new ArrayList<>();
+    private ArrayList<Integer> ids = new ArrayList<>();
+
+    RecyclerView dogsView;
+    RecyclerViewAdapter dogsViewAdapter;
+
+    DogDatabaseHelper dogDatabaseHelper;
 
 
     @Override
@@ -71,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
             List<Food> foodList = dataBaseHelper.getFoods("", "");
@@ -84,7 +92,21 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
 
+    public void onResume() {
+        super.onResume();
+        if (dogsViewAdapter != null) {
+            try {
+                List<Dog> dogs = loadDogs();
+                clearDogViewData();
+                getDogViewData(dogs);
+                dogsViewAdapter.updateItemList(names, images, ids);
+                dogsViewAdapter.notifyDataSetChanged();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -112,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Dog> loadDogs() throws IOException {
         List<Dog> dogs = new ArrayList<>();
         try {
-            DogDatabaseHelper dogDatabaseHelper = new DogDatabaseHelper(MainActivity.this);
+            dogDatabaseHelper = new DogDatabaseHelper(MainActivity.this);
             dogs = dogDatabaseHelper.getDogs(null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,23 +145,45 @@ public class MainActivity extends AppCompatActivity {
     private void initDogsView() throws IOException {
         List<Dog> dogs = loadDogs();
         getDogViewData(dogs);
-        RecyclerView dogsView = findViewById(R.id.dogs_view);
-        RecyclerViewAdapter dogsViewAdapter = new RecyclerViewAdapter(this, names, images);
+        dogsView = findViewById(R.id.dogs_view);
+        dogsViewAdapter = new RecyclerViewAdapter(this, names, images, ids);
         dogsView.setLayoutManager(new LinearLayoutManager(this));
         dogsView.setAdapter(dogsViewAdapter);
 
+        registerForContextMenu(dogsView);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        dogDatabaseHelper.removeDogById(item.getGroupId());
+        int position = dogsViewAdapter.getPosition();
+        int databaseId = dogsViewAdapter.getItemDatabaseId();
+
+        dogDatabaseHelper.removeDogById(databaseId);
+        dogsViewAdapter.removeItem(position);
+        dogsViewAdapter.notifyItemRemoved(position);
+        dogsViewAdapter.notifyItemRangeChanged(position, dogsViewAdapter.getItemCount());
+
+        return super.onContextItemSelected(item);
     }
 
     private void getDogViewData(List<Dog> dogs) {
         byte[] defaultImage = getDefaultImage_asBit_array(ContextCompat.getDrawable(MainActivity.this, R.drawable.dog_silhouette));
         for (Dog dog : dogs) {
             names.add(dog.getDogName());
+            ids.add(dog.getId());
             if (dog.getStringImage() == null) {
                 images.add((defaultImage));
             } else {
                 images.add(stringToBitmap(dog.getStringImage()));
             }
         }
+    }
+
+    private void clearDogViewData() {
+        names.clear();
+        images.clear();
+        ids.clear();
     }
 
     private byte[] getDefaultImage_asBit_array(Drawable resource) {

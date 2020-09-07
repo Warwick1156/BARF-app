@@ -44,6 +44,12 @@ public class DogDatabaseHelper extends DataBaseHelper {
         db.close();
     }
 
+    public void removeDogById(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("DOG", "id=" + id, null);
+        db.close();
+    }
+
     public List<Dog> getDogs(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Dog> dogs = new ArrayList<>();

@@ -84,11 +84,27 @@ public class Meal {
         return separated;
     }
 
+//    private HashMap<Food, Integer> chooseFoods(EnumMap<FoodType, List<Food>> foods, EnumMap<FoodType, Float> globalConstraints) {
+//        List<HashMap<Food, Integer>> result = new ArrayList<>();
+//        EnumMap<FoodType, Float> localConstraints = globalConstraints.clone();
+//        for (FoodType type : FoodType.values()) {
+//            HashMap<Food, Integer> partResult = knapsack_approximate(foods.get(type), null, localConstraints.get(type), type);
+//            result.add(partResult);
+//            if (type.equals(FoodType.BONE)) {
+//                List<Food> separated = separateMeatFromBone(partResult);
+//                localConstraints = correctMeatConstrains(separated, localConstraints);
+//            }
+//        }
+//
+//        HashMap<Food, Integer> mapResult = mergeHashMapList(result);
+//        return mapResult;
+//    }
+
     private HashMap<Food, Integer> chooseFoods(EnumMap<FoodType, List<Food>> foods, EnumMap<FoodType, Float> globalConstraints) {
         List<HashMap<Food, Integer>> result = new ArrayList<>();
         EnumMap<FoodType, Float> localConstraints = globalConstraints.clone();
         for (FoodType type : FoodType.values()) {
-            HashMap<Food, Integer> partResult = knapsack_approximate(foods.get(type), null, localConstraints.get(type), type);
+            HashMap<Food, Integer> partResult = knapsack(foods.get(type), null, localConstraints, type);
             result.add(partResult);
             if (type.equals(FoodType.BONE)) {
                 List<Food> separated = separateMeatFromBone(partResult);
@@ -154,6 +170,85 @@ public class Meal {
             }
         }
 
+        HashMap<Food, Integer> result = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            if (selections[i] != 0) {
+                result.put(items.get(i), selections[i]);
+            }
+        }
+        return result;
+    }
+
+    private HashMap<Food, Integer> knapsack(List<Food> items, ComponentType target, EnumMap<FoodType, Float> constraints, FoodType type) {
+        List<ApproximateItem> approxItems = new ArrayList<>();
+        int n = items.size();
+
+        for (int i = 0; i < n; i++) {
+            Food food = items.get(i);
+            float foodWeight;
+            if (type.equals(FoodType.BONE)) {
+                foodWeight = food.getPortion() * food.getBones();
+            } else {
+                foodWeight = food.getPortion();
+            }
+            if (target == null) {
+                approxItems.add(new ApproximateItem(0, foodWeight, i));
+            } else {
+                List<Component> foodComponentList = food.getComponentList();
+                Component targetComponent = foodComponentList.stream()
+                        .filter(component -> target.equals(component.get_Id()))
+                        .findAny()
+                        .orElse(null);
+
+                approxItems.add(new ApproximateItem(targetComponent.getValue(), foodWeight, i));
+            }
+        }
+
+        if (target == null) {
+            Collections.shuffle(approxItems);
+        } else {
+            approxItems.sort(Comparator.comparing(ApproximateItem::getNormalizedValue));
+            Collections.reverse(approxItems);
+        }
+
+        int[] selections = new int[n];
+        Arrays.fill(selections, 0);
+
+        if (type.equals(FoodType.BONE)) {
+            float bone = constraints.get(FoodType.BONE);
+            float meat = constraints.get(FoodType.MEAT);
+
+            for (int i = 0; i < n; i++) {
+                int numAdd = 0;
+                ApproximateItem item = approxItems.get(i);
+                if (bone <= 0 || meat <= 0) break;
+
+                float boneWeight = item.getWeight();
+                int maxPortions_Bone = (int) Math.floor(bone / boneWeight);
+
+                float meatWeight = items.get(item.getIndex()).getPortion() - boneWeight;
+                int maxPortions_Meat = (int) Math.floor(meat / meatWeight);
+
+                if (maxPortions_Bone > 0 && maxPortions_Meat > 0) {
+                    numAdd = Math.min(maxPortions_Bone, maxPortions_Meat);
+                }
+
+                selections[item.getIndex()] += numAdd;
+                bone -= numAdd * boneWeight;
+                meat -= numAdd * meatWeight;
+            }
+        } else {
+            float constraint = constraints.get(type);
+
+            for (int i = 0; i < n; i++) {
+                ApproximateItem item = approxItems.get(i);
+                if (constraint == 0) break;
+
+                int numAdd = (int) Math.floor(constraint / item.getWeight());
+                selections[item.getIndex()] += numAdd;
+                constraint -= numAdd * item.getWeight();
+            }
+        }
         HashMap<Food, Integer> result = new HashMap<>();
         for (int i = 0; i < n; i++) {
             if (selections[i] != 0) {
