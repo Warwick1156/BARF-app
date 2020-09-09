@@ -27,6 +27,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
 
     private static final String TAG = "RecyclerViewAdapter";
+    private static final String DOG_ID = "DOG_ID";
 
     private ArrayList<String> mImageNames = new ArrayList<>();
     private ArrayList<String> mImages = new ArrayList<>();
@@ -74,6 +75,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onClick(View view) {
                 Log.d(TAG, "onClick: clicked on: " + mImageNames.get(position));
                 Toast.makeText(mContext, mImageNames.get(position), Toast.LENGTH_SHORT).show();
+
+                setPosition(holder.getAdapterPosition());
+                Intent intent = new Intent(mContext, DogMainTabActivity.class);
+                intent.putExtra(DOG_ID, getItemDatabaseId());
+                mContext.startActivity(intent);
             }
         });
 

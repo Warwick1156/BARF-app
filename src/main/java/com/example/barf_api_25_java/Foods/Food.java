@@ -5,6 +5,7 @@ import com.example.barf_api_25_java.Types.FoodType;
 import java.util.List;
 
 public class Food {
+
     private String name;
     private String animal;
     private FoodType category;
@@ -35,5 +36,13 @@ public class Food {
 
     public List<Component> getComponentList() {
         return componentList;
+    }
+
+    public String getFoodName() {
+        return name;
+    }
+
+    public String getAnimal() {
+        return animal;
     }
 }

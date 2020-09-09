@@ -20,6 +20,7 @@ public class DogDatabaseHelper extends DataBaseHelper {
     public static final String WEIGHT = "Weight";
     public static final String BREED_TYPE = "BreedType";
     public static final String ACTIVITY_TYPE = "ActivityType";
+    public static final String IMAGE = "Image";
 
     public DogDatabaseHelper(@Nullable Context context) throws IOException {
         super(context);
@@ -77,6 +78,35 @@ public class DogDatabaseHelper extends DataBaseHelper {
         cursor.close();
         db.close();
         return dogs;
+    }
+
+    public Dog getDogFromId(int id) {
+        Dog dog = new Dog();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query("DOG", null, "Id=" + id, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            String dogName = cursor.getString(1);
+            int dogAge = cursor.getInt(2);
+            float dogWeight = cursor.getFloat(3);
+            BreedType dogBreedType = BreedType.valueOf(cursor.getString(4).toUpperCase());
+            ActivityType dogActivityType = ActivityType.valueOf(cursor.getString(5).toUpperCase());
+            String stringImage = cursor.getString(6);
+            dog = new Dog(id, dogAge, dogWeight, dogName, dogActivityType, dogBreedType, stringImage);
+        }
+        cursor.close();
+        db.close();
+        return dog;
+    }
+
+    public void setPhoto(int dogId, String image) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(IMAGE, image);
+        db.update("DOG", cv, "Id=" + dogId, null);
+
+        db.close();
     }
 
 }

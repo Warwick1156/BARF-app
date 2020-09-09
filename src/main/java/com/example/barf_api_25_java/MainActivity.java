@@ -96,16 +96,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void onResume() {
         super.onResume();
-        if (dogsViewAdapter != null) {
-            try {
-                List<Dog> dogs = loadDogs();
-                clearDogViewData();
-                getDogViewData(dogs);
-                dogsViewAdapter.updateItemList(names, images, ids);
-                dogsViewAdapter.notifyDataSetChanged();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            List<Dog> dogs = loadDogs();
+            clearDogViewData();
+            getDogViewData(dogs);
+            dogsViewAdapter.updateItemList(names, images, ids);
+            dogsViewAdapter.notifyDataSetChanged();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

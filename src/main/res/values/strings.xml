@@ -16,4 +16,12 @@
     <string name="Name">Name</string>
     <string name="Weight">Weight [kg]</string>
     <string name="DogActivity">Dog activity</string>
+    <string name="EditPhoto">Edit Photo</string>
+    <string name="DogName">Dog\'s Name</string>
+    <string name="NewMeal">New Meal</string>
+    <string name="Archive">Archive</string>
+    <string name="createMealPlan">How many meals to create?</string>
+    <string  name="Cancel">Cancel</string>
+    <string name="Ok">Ok</string>
+    <string name="PickImage">Pick image</string>
 </resources>

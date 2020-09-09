@@ -30,6 +30,8 @@ public class Dog {
         this.stringImage = stringImage;
     }
 
+    public Dog(){}
+
     public int getAge() {
         return age;
     }
@@ -56,5 +58,9 @@ public class Dog {
 
     public String getStringImage() {
         return stringImage;
+    }
+
+    public void setStringImage(String stringImage) {
+        this.stringImage = stringImage;
     }
 }
