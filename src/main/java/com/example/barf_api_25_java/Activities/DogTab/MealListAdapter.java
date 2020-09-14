@@ -1,4 +1,4 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.DogTab;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+
+import com.example.barf_api_25_java.R;
 
 public class MealListAdapter extends BaseExpandableListAdapter {
 

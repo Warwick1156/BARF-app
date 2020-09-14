@@ -5,11 +5,11 @@ import com.example.barf_api_25_java.Types.ActivityType;
 public class FoodTargetWeight {
     private int targetWeight;
 
-    FoodTargetWeight(float dogWeight, ActivityType activityType) {
+    public FoodTargetWeight(float dogWeight, ActivityType activityType) {
         this.targetWeight = calculateFoodTargetWeight(dogWeight, activityType);
     }
 
-    FoodTargetWeight(int targetWeight) {
+    public FoodTargetWeight(int targetWeight) {
         this.targetWeight = targetWeight;
     }
 

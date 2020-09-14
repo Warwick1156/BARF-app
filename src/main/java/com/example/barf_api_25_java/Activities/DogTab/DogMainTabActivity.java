@@ -1,11 +1,11 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.DogTab;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
@@ -21,16 +21,18 @@ import androidx.core.content.ContextCompat;
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
 import com.example.barf_api_25_java.Data.MealDatabaseHelper;
+import com.example.barf_api_25_java.Data.SettingsDatabaseHelper;
 import com.example.barf_api_25_java.Foods.MealPlan;
+import com.example.barf_api_25_java.R;
+import com.example.barf_api_25_java.Settings.Settings;
 import com.example.barf_api_25_java.Utils.ImageUtils;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,10 +46,15 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
 
     private Button btnNewMeal;
     private Button btnEditPhoto;
+    private Button btnArchive;
     private TextView tvDogName;
     private ImageView ivDogPhoto;
+
     private Dog dog;
     private DogDatabaseHelper dogDatabaseHelper;
+    private Settings settings;
+    private SettingsDatabaseHelper settingsDatabaseHelper;
+    private MealPlan mealPlan;
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
@@ -55,6 +62,8 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
     HashMap<String, List<String>> expandableListDetail;
 
     MealDatabaseHelper mealDatabaseHelper;
+
+    MealListDataPump mealListDataPump;
 
 
     @Override
@@ -68,16 +77,16 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         try {
             dogDatabaseHelper = new DogDatabaseHelper(DogMainTabActivity.this);
             dog = dogDatabaseHelper.getDogFromId(getIntent().getIntExtra(DOG_ID, 0));
-            tvDogName.setText(dog.getDogName());
+            settings = new Settings(DogMainTabActivity.this, dog.getId());
+            mealListDataPump = new MealListDataPump(DogMainTabActivity.this, dog.getId());
+            mealDatabaseHelper = new MealDatabaseHelper(DogMainTabActivity.this);
+        } catch (IOException e) { e.printStackTrace(); }
+        tvDogName.setText(dog.getDogName());
 
-            byte[] photoArray = getPhoto();
-            Bitmap photo = BitmapFactory.decodeByteArray(photoArray, 0, photoArray.length);
-            ivDogPhoto.setImageBitmap(photo);
+        byte[] photoArray = getPhoto();
+        Bitmap photo = BitmapFactory.decodeByteArray(photoArray, 0, photoArray.length);
+        ivDogPhoto.setImageBitmap(photo);
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         btnNewMeal = findViewById(R.id.btn_NewMeal);
         btnNewMeal.setOnClickListener(new View.OnClickListener() {
@@ -98,9 +107,17 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
             }
         });
 
+        btnArchive = findViewById(R.id.btn_Archive);
+        btnArchive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
         expandableListView = (ExpandableListView) findViewById(R.id.mealListView);
-        expandableListDetail = MealListDataPump.getData();
+        expandableListDetail = mealListDataPump.getData();
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        Collections.sort(expandableListTitle);
         expandableListAdapter = new MealListAdapter(this, expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -158,8 +175,9 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
     }
 
     @Override
-    public void newMealPlan(int mealsNo) {
-
+    public void newMealPlan(int mealsNo) throws ParseException {
+        mealPlan = new MealPlan(mealsNo, settings.foodTargetWeight.getTargetWeight(), settings.mealProportions, settings.allowedFoods.getAllowedFoods());
+        mealDatabaseHelper.saveMealPlan(dog.getId(), mealPlan);
     }
 
     private byte[] getPhoto() {
@@ -173,34 +191,31 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         return photo;
     }
 
+    public int getSquareCropDimensionForBitmap(Bitmap bitmap) {
+        return Math.min(bitmap.getWidth(), bitmap.getHeight());
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK && data != null) {
             Uri imageData = data.getData();
-            ivDogPhoto.setImageURI(imageData);
             try {
                 InputStream imageStream = getContentResolver().openInputStream(imageData);
                 Bitmap bitmapImage = BitmapFactory.decodeStream(imageStream);
+
+                int dimension = getSquareCropDimensionForBitmap(bitmapImage);
+                bitmapImage = ThumbnailUtils.extractThumbnail(bitmapImage, dimension, dimension);
+
                 String stringImage = bitmapToString(bitmapImage);
                 dog.setStringImage(stringImage);
                 dogDatabaseHelper.setPhoto(dog.getId(), stringImage);
-
-//                CropImage.activity(Uri.parse(dog.getStringImage()))
-//                        .start(DogMainTabActivity.this);
+                ivDogPhoto.setImageBitmap(bitmapImage);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-            }
         }
     }
 }

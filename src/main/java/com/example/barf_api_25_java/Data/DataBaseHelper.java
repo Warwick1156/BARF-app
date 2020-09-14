@@ -33,7 +33,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         String path = DB_PATH + DB_NAME;
         if (checkFileExistence(path)) {
-            openDataBase();
+//            openDataBase();
+//            closeDatabase();
         }
         else {
             copyDatabase();
@@ -104,13 +105,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 List<Component> componentList = new ArrayList<>();
-                String foodName = cursor.getString(0);
-                String foodAnimal = cursor.getString(1);
-                FoodType foodType = FoodType.valueOf(cursor.getString(2).toUpperCase());
-                float foodPortion = cursor.getFloat(3);
-                float foodBones = cursor.getFloat(4);
+                int foodId = cursor.getInt(0);
+                String foodName = cursor.getString(1);
+                String foodAnimal = cursor.getString(2);
+                FoodType foodType = FoodType.valueOf(cursor.getString(3).toUpperCase());
+                float foodPortion = cursor.getFloat(4);
+                float foodBones = cursor.getFloat(5);
 
-                for (int i = 5; i < cursor.getColumnCount(); i++) {
+                for (int i = 6; i < cursor.getColumnCount(); i++) {
                     ComponentType id = Component.get_Id(cursor.getColumnName(i));
                     float value = cursor.getFloat(i);
 
@@ -118,7 +120,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     componentList.add(component);
                 }
 
-                Food food = new Food(foodName, foodAnimal, foodType, foodPortion, foodBones, componentList);
+                Food food = new Food(foodId, foodName, foodAnimal, foodType, foodPortion, foodBones, componentList);
                 foodList.add(food);
             } while (cursor.moveToNext());
         }

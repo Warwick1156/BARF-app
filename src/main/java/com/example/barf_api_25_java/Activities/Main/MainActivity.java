@@ -1,39 +1,35 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.Main;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 
+import com.example.barf_api_25_java.Activities.AddDog.AddDogActivity;
 import com.example.barf_api_25_java.Data.DataBaseHelper;
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
 import com.example.barf_api_25_java.Foods.Food;
 import com.example.barf_api_25_java.Foods.Meal;
 import com.example.barf_api_25_java.Foods.MealPlan;
+import com.example.barf_api_25_java.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.example.barf_api_25_java.Utils.ImageUtils.stringToBitmap;
@@ -81,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-            List<Food> foodList = dataBaseHelper.getFoods("", "");
+//            List<Food> foodList = dataBaseHelper.getFoods("", "");
             //Meal meal = new Meal(600);
             //meal.createMeal(foodList);
-            MealPlan mealPlan = new MealPlan(7, 600, foodList);
-            mealPlan.createMealPlan();
-            List<Meal> mealList = mealPlan.getMealList();
-            System.out.println("");
+//            MealPlan mealPlan = new MealPlan(7, 600, foodList);
+//            mealPlan.createMealPlan();
+//            List<Meal> mealList = mealPlan.getMealList();
+//            System.out.println("");
         } catch (IOException e) {
             e.printStackTrace();
         }

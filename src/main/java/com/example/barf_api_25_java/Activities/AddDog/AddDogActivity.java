@@ -1,4 +1,4 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.AddDog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,6 +13,10 @@ import android.widget.Toast;
 
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
+import com.example.barf_api_25_java.R;
+import com.example.barf_api_25_java.Settings.FoodTargetWeight;
+import com.example.barf_api_25_java.Settings.MealProportions;
+import com.example.barf_api_25_java.Settings.Settings;
 import com.example.barf_api_25_java.Types.ActivityType;
 import com.example.barf_api_25_java.Types.BreedType;
 
@@ -52,7 +56,13 @@ public class AddDogActivity extends AppCompatActivity implements AdapterView.OnI
                             BreedType.valueOf(breedTypeSpinner.getSelectedItem().toString().toUpperCase()));
 
                     DogDatabaseHelper dogDatabaseHelper = new DogDatabaseHelper(AddDogActivity.this);
-                    dogDatabaseHelper.createDog(dog);
+                    int dogId = dogDatabaseHelper.createDog(dog);
+
+                    MealProportions mealProportions = new MealProportions();
+                    FoodTargetWeight foodTargetWeight = new FoodTargetWeight(dog.getWeight(), dog.getActivity());
+                    Settings settings = new Settings(AddDogActivity.this, dogId, foodTargetWeight, mealProportions);
+                    settings.allowedFoods.allowAll();
+                    settings.saveSettings();
 
                     finish();
                 } catch (Exception e) {

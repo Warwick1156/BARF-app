@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,8 +31,13 @@ public class MealDatabaseHelper extends DataBaseHelper {
 
     public static final String NAME = "Name";
     public static final String ANIMAL = "Animal";
+    public static final String FOOD_ID = "FoodId";
     public static final String PORTIONS = "Portions";
     public static final String PORTION_WEIGHT = "PortionWeight";
+
+    public static final String MEAL_FOODS = "MEAL_FOODS";
+    public static final String MEAL = "MEAL";
+    public static final String DESCENDING = " DESC";
 
     public MealDatabaseHelper(@Nullable Context context) throws IOException {
         super(context);
@@ -66,25 +72,29 @@ public class MealDatabaseHelper extends DataBaseHelper {
     }
 
     private Date addOneDay(Date date) {
-        LocalDateTime nextDay = LocalDateTime.from(date.toInstant()).plusDays(1);
+        LocalDateTime nextDay = date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        nextDay = nextDay.plusDays(1);
         return Date.from(nextDay.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private List<String> getMealDates(int dogId) {
+    public List<String> getMealDates(int dogId) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<String> mealDates = new ArrayList<>();
 
-        Cursor cursor = db.query("MEAL", new String[]{DATE}, "DogId=" + dogId, null, null, null, "Date, DES");
+        Cursor cursor = db.query(MEAL, new String[]{DATE}, DOG_ID + "=" + dogId, null, null, null, DATE + DESCENDING);
         if (cursor.moveToFirst()) {
             do {
                 mealDates.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
+        db.close();
         return mealDates;
     }
 
     private Date stringToDate(String date) throws ParseException {
-        return new SimpleDateFormat("yyyy/mm/dd").parse(date);
+        return new SimpleDateFormat("yyyy-mm-dd").parse(date);
     }
 
     private String dateToString(Date date) {
@@ -92,7 +102,7 @@ public class MealDatabaseHelper extends DataBaseHelper {
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.YEAR);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         return year + "-" + month + "-" + day;
     }
@@ -107,7 +117,7 @@ public class MealDatabaseHelper extends DataBaseHelper {
         db.close();
     }
 
-    private int getMealId(int dogId, String date) {
+    public int getMealId(int dogId, String date) {
         SQLiteDatabase db = this.getReadableDatabase();
         int mealId = 0;
         Cursor cursor = db.query("MEAL", new String[]{MEAL_ID}, "DogId=" + dogId + AND + "Date=" + date, null, null, null, null);
@@ -117,14 +127,28 @@ public class MealDatabaseHelper extends DataBaseHelper {
         return mealId;
     }
 
+    public HashMap<Integer, Integer> getMealFoodData(int mealId) {
+        HashMap<Integer, Integer> mealFoodsData = new HashMap<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(MEAL_FOODS, new String[]{FOOD_ID, PORTIONS}, MEAL_ID + "=" + mealId, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                mealFoodsData.put(cursor.getInt(0), cursor.getInt(1));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return mealFoodsData;
+    }
+
     private void saveFood(int mealId, int portions, Food food) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(MEAL_ID, mealId);
-        cv.put(NAME, food.getFoodName());
-        cv.put(ANIMAL, food.getAnimal());
+        cv.put(FOOD_ID, food.getId());
         cv.put(PORTIONS, portions);
-        cv.put(PORTION_WEIGHT, food.getPortion());
 
         db.insert("MEAL_FOODS", null, cv);
         db.close();
@@ -162,4 +186,10 @@ public class MealDatabaseHelper extends DataBaseHelper {
         db.delete("MEAL_FOODS", "MealId=" + mealId, null);
         db.close();
     }
+
+    public List<String> getMealPlan(int dogId) {
+        return getMealDates(dogId);
+    }
+
+
 }

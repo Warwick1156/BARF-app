@@ -17,6 +17,12 @@ public class PerfectMeal extends Meal {
         this.categoryTargetMap = baseTarget;
     }
 
+    public PerfectMeal(int targetWeight, MealProportions mealProportions) {
+        this.proportions = mealProportions;
+        this.baseTarget = splitTotalWeight(proportions.getProportions(), targetWeight);
+        this.categoryTargetMap = baseTarget;
+    }
+
     public void update(EnumMap<FoodType, Float> errorMap) {
         categoryTargetMap = new EnumMap<FoodType, Float>(FoodType.class);
         for (FoodType type : FoodType.values()) {

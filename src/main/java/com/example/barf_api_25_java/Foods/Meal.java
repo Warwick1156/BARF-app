@@ -263,7 +263,7 @@ public class Meal {
         for (HashMap.Entry<Food, Integer> foodKey : boneMeat.entrySet()) {
             Food food = foodKey.getKey();
             float newPortion = food.getPortion() * (1 - food.getBones()) * foodKey.getValue();
-            Food dummy = new Food(null, null, FoodType.MEAT, newPortion, 0, food.getComponentList());
+            Food dummy = new Food(0, null, null, FoodType.MEAT, newPortion, 0, food.getComponentList());
             result.add(dummy);
         }
 

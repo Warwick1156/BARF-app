@@ -26,17 +26,22 @@ public class DogDatabaseHelper extends DataBaseHelper {
         super(context);
     }
 
-    public void createDog(Dog dog) {
+    public int createDog(Dog dog) {
         SQLiteDatabase db = this.getWritableDatabase();
+        long id = db.insert("DOG", null, createDogContentValues(dog));
+        db.close();
+
+        return (int) id;
+    }
+
+    private ContentValues createDogContentValues(Dog dog) {
         ContentValues cv = new ContentValues();
         cv.put(NAME, dog.getDogName());
         cv.put(AGE, dog.getAge());
         cv.put(WEIGHT, dog.getWeight());
         cv.put(BREED_TYPE, dog.getBreedType().toString());
         cv.put(ACTIVITY_TYPE, dog.getActivity().toString());
-
-        db.insert("DOG", null, cv);
-        db.close();
+        return cv;
     }
 
     public void removeDog(Dog dog) {
