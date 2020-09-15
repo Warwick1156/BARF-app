@@ -87,33 +87,6 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         Bitmap photo = BitmapFactory.decodeByteArray(photoArray, 0, photoArray.length);
         ivDogPhoto.setImageBitmap(photo);
 
-
-        btnNewMeal = findViewById(R.id.btn_NewMeal);
-        btnNewMeal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createMealPlanDialog();
-            }
-        });
-
-        btnEditPhoto = findViewById(R.id.btn_changeImage);
-        btnEditPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.PickImage)), GALLERY_REQUEST);
-            }
-        });
-
-        btnArchive = findViewById(R.id.btn_Archive);
-        btnArchive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
         expandableListView = (ExpandableListView) findViewById(R.id.mealListView);
         expandableListDetail = mealListDataPump.getData();
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
@@ -157,7 +130,34 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
             }
         });
 
-//        loadDates();
+        btnNewMeal = findViewById(R.id.btn_NewMeal);
+        btnNewMeal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createMealPlanDialog();
+            }
+        });
+
+        btnEditPhoto = findViewById(R.id.btn_changeImage);
+        btnEditPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.PickImage)), GALLERY_REQUEST);
+            }
+        });
+
+        btnArchive = findViewById(R.id.btn_Archive);
+        btnArchive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
+
+
     }
 
     public void createMealPlanDialog() {
@@ -165,19 +165,17 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         createMealPlanDialog1.show(getSupportFragmentManager(), "Create meal plan");
     }
 
-    private void loadDates(){
-        try {
-            mealDatabaseHelper = new MealDatabaseHelper(DogMainTabActivity.this);
-            mealDatabaseHelper.saveMealPlan(5, new MealPlan(2, 2, new ArrayList<>()));
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void newMealPlan(int mealsNo) throws ParseException {
         mealPlan = new MealPlan(mealsNo, settings.foodTargetWeight.getTargetWeight(), settings.mealProportions, settings.allowedFoods.getAllowedFoods());
         mealDatabaseHelper.saveMealPlan(dog.getId(), mealPlan);
+
+        expandableListDetail = mealListDataPump.getData();
+        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        Collections.sort(expandableListTitle);
+        expandableListAdapter = new MealListAdapter(DogMainTabActivity.this, expandableListTitle, expandableListDetail);
+        expandableListView.setAdapter(expandableListAdapter);
+//        expandableListAdapter.changeDataSet(expandableListTitle, expandableListDetail);
     }
 
     private byte[] getPhoto() {

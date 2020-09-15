@@ -63,7 +63,7 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
         return new FoodTargetWeight(targetWeight);
     }
 
-    public void deleteFoodTargetWeight(int dogId) {
+    private void deleteFoodTargetWeight(int dogId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(MEAL_TARGET_WEIGHT, DOG_ID + "=" + dogId, null);
         db.close();
@@ -100,47 +100,10 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
         return new MealProportions(meat, bones, offal);
     }
 
-    public void deleteMealProportions(int dogId) {
+    private void deleteMealProportions(int dogId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(MEAL_PROPORTIONS, DOG_ID + "=" + dogId, null);
         db.close();
-    }
-
-    public List<Food> getAllowedFoods(int dogId) {
-        List<Food> foodList = new ArrayList<>();
-
-        String query = "SELECT * FROM FOOD";
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query("FOOD", null, null, null, null, null, null);
-        // Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                List<Component> componentList = new ArrayList<>();
-                int foodId = cursor.getInt(0);
-                String foodName = cursor.getString(1);
-                String foodAnimal = cursor.getString(2);
-                FoodType foodType = FoodType.valueOf(cursor.getString(3).toUpperCase());
-                float foodPortion = cursor.getFloat(4);
-                float foodBones = cursor.getFloat(5);
-
-                for (int i = 6; i < cursor.getColumnCount(); i++) {
-                    ComponentType id = Component.get_Id(cursor.getColumnName(i));
-                    float value = cursor.getFloat(i);
-
-                    Component component = new Component(id, value);
-                    componentList.add(component);
-                }
-
-                Food food = new Food(foodId, foodName, foodAnimal, foodType, foodPortion, foodBones, componentList);
-                foodList.add(food);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-
-        return foodList;
     }
 
     public List<Integer> getAllowedFoodsIds(int dogId) {
@@ -160,6 +123,12 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
         return foodIds;
     }
 
+    private void deleteAllowedFoods(int dogId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(ALLOWED_FOODS, DOG_ID + "=" + dogId, null);
+        db.close();
+    }
+
     public void setAllowment(int dogId, int foodId, String allow) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -169,6 +138,12 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
 
         db.insert(ALLOWED_FOODS, null, cv);
         db.close();
+    }
+
+    public void deleteSettings(int dogId) {
+        deleteFoodTargetWeight(dogId);
+        deleteMealProportions(dogId);
+        deleteAllowedFoods(dogId);
     }
 
 }

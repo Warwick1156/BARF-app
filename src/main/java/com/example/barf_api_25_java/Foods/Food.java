@@ -24,6 +24,8 @@ public class Food {
         this.componentList = componentList;
     }
 
+    public Food(){};
+
     public FoodType getCategory() {
         return category;
     }

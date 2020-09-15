@@ -10,6 +10,8 @@ import com.example.barf_api_25_java.Activities.AddDog.AddDogActivity;
 import com.example.barf_api_25_java.Data.DataBaseHelper;
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
+import com.example.barf_api_25_java.Data.MealDatabaseHelper;
+import com.example.barf_api_25_java.Data.SettingsDatabaseHelper;
 import com.example.barf_api_25_java.Foods.Food;
 import com.example.barf_api_25_java.Foods.Meal;
 import com.example.barf_api_25_java.Foods.MealPlan;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerViewAdapter dogsViewAdapter;
 
     DogDatabaseHelper dogDatabaseHelper;
+    SettingsDatabaseHelper settingsDatabaseHelper;
+    MealDatabaseHelper mealDatabaseHelper;
 
 
     @Override
@@ -69,25 +73,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         try {
+            DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
             initDogsView();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-//            List<Food> foodList = dataBaseHelper.getFoods("", "");
-            //Meal meal = new Meal(600);
-            //meal.createMeal(foodList);
-//            MealPlan mealPlan = new MealPlan(7, 600, foodList);
-//            mealPlan.createMealPlan();
-//            List<Meal> mealList = mealPlan.getMealList();
-//            System.out.println("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public void onResume() {
@@ -128,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Dog> loadDogs() throws IOException {
         List<Dog> dogs = new ArrayList<>();
         try {
+            settingsDatabaseHelper = new SettingsDatabaseHelper(MainActivity.this);
+            mealDatabaseHelper = new MealDatabaseHelper(MainActivity.this);
             dogDatabaseHelper = new DogDatabaseHelper(MainActivity.this);
             dogs = dogDatabaseHelper.getDogs(null);
         } catch (Exception e) {
@@ -154,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
         int databaseId = dogsViewAdapter.getItemDatabaseId();
 
         dogDatabaseHelper.removeDogById(databaseId);
+        settingsDatabaseHelper.deleteSettings(databaseId);
+        mealDatabaseHelper.deleteMealPlan(databaseId);
+
         dogsViewAdapter.removeItem(position);
         dogsViewAdapter.notifyItemRemoved(position);
         dogsViewAdapter.notifyItemRangeChanged(position, dogsViewAdapter.getItemCount());

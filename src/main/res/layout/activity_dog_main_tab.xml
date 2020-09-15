@@ -41,8 +41,9 @@
     <ExpandableListView
         android:id="@+id/mealListView"
         android:layout_width="match_parent"
-        android:layout_height="1500px"
-        android:layout_marginTop="24dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="265dp"
+        android:transcriptMode="alwaysScroll"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.5dp"
         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"

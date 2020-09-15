@@ -25,6 +25,12 @@ public class MealListAdapter extends BaseExpandableListAdapter {
         this.expandableListDetail = expandableListDetail;
     }
 
+    public void changeDataSet(List<String> listDataHeader, HashMap<String, List<String>> listChildData) {
+        this.expandableListTitle = listDataHeader;
+        this.expandableListDetail = listChildData;
+        this.notifyDataSetChanged();
+    }
+
     @Override
     public Object getChild(int listPosition, int expandedListPosition) {
         return this.expandableListDetail.get(this.expandableListTitle.get(listPosition))

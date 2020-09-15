@@ -83,10 +83,13 @@ public class FoodDatabaseHelper extends DataBaseHelper {
     }
 
     public Food getFoodById(int id) {
+        Food food = new Food();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(FOOD, null, ID + "=" + id, null, null, null, null);
-//        Cursor cursor = db.query(FOOD, null, null, null, null, null, null);
-        Food food = getFoodFromCursor(cursor);
+
+        if (cursor.moveToFirst()) {
+            food = getFoodFromCursor(cursor);
+        }
 
         cursor.close();
         db.close();
@@ -123,7 +126,6 @@ public class FoodDatabaseHelper extends DataBaseHelper {
 
     private String makePlaceholders(int len) {
         if (len < 1) {
-            // It will lead to an invalid query anyway ..
             throw new RuntimeException("No placeholders");
         } else {
             StringBuilder sb = new StringBuilder(len * 2 - 1);
