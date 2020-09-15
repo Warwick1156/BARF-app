@@ -18,6 +18,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.barf_api_25_java.Activities.AddDog.AddDogActivity;
+import com.example.barf_api_25_java.Activities.DogTab.ArchiveMeals.ArchiveMealsActivity;
+import com.example.barf_api_25_java.Activities.Main.MainActivity;
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
 import com.example.barf_api_25_java.Data.MealDatabaseHelper;
@@ -76,11 +79,13 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
 
         try {
             dogDatabaseHelper = new DogDatabaseHelper(DogMainTabActivity.this);
-            dog = dogDatabaseHelper.getDogFromId(getIntent().getIntExtra(DOG_ID, 0));
+            dog = dogDatabaseHelper.getDogFromId(getIntent().getIntExtra(DOG_ID, -1));
+
             settings = new Settings(DogMainTabActivity.this, dog.getId());
             mealListDataPump = new MealListDataPump(DogMainTabActivity.this, dog.getId());
             mealDatabaseHelper = new MealDatabaseHelper(DogMainTabActivity.this);
         } catch (IOException e) { e.printStackTrace(); }
+
         tvDogName.setText(dog.getDogName());
 
         byte[] photoArray = getPhoto();
@@ -88,44 +93,23 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         ivDogPhoto.setImageBitmap(photo);
 
         expandableListView = (ExpandableListView) findViewById(R.id.mealListView);
-        expandableListDetail = mealListDataPump.getData();
-        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        Collections.sort(expandableListTitle);
-        expandableListAdapter = new MealListAdapter(this, expandableListTitle, expandableListDetail);
-        expandableListView.setAdapter(expandableListAdapter);
-        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+        setUpExpandableList();
 
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getApplicationContext(),
-                        expandableListTitle.get(groupPosition) + " List Expanded.",
-                        Toast.LENGTH_SHORT).show();
             }
         });
 
         expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-
             @Override
             public void onGroupCollapse(int groupPosition) {
-                Toast.makeText(getApplicationContext(),
-                        expandableListTitle.get(groupPosition) + " List Collapsed.",
-                        Toast.LENGTH_SHORT).show();
-
             }
         });
 
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        expandableListTitle.get(groupPosition)
-                                + " -> "
-                                + expandableListDetail.get(
-                                expandableListTitle.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT
-                ).show();
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 return false;
             }
         });
@@ -153,10 +137,11 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         btnArchive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(DogMainTabActivity.this, ArchiveMealsActivity.class);
+                intent.putExtra(DOG_ID, dog.getId());
+                startActivity(intent);
             }
         });
-
-
 
     }
 
@@ -170,11 +155,7 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
         mealPlan = new MealPlan(mealsNo, settings.foodTargetWeight.getTargetWeight(), settings.mealProportions, settings.allowedFoods.getAllowedFoods());
         mealDatabaseHelper.saveMealPlan(dog.getId(), mealPlan);
 
-        expandableListDetail = mealListDataPump.getData();
-        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        Collections.sort(expandableListTitle);
-        expandableListAdapter = new MealListAdapter(DogMainTabActivity.this, expandableListTitle, expandableListDetail);
-        expandableListView.setAdapter(expandableListAdapter);
+        setUpExpandableList();
 //        expandableListAdapter.changeDataSet(expandableListTitle, expandableListDetail);
     }
 
@@ -213,7 +194,15 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
         }
     }
+
+    private void setUpExpandableList() {
+        expandableListDetail = mealListDataPump.getRelevantData();
+        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        Collections.sort(expandableListTitle);
+        expandableListAdapter = new MealListAdapter(DogMainTabActivity.this, expandableListTitle, expandableListDetail);
+        expandableListView.setAdapter(expandableListAdapter);
+    }
+
 }

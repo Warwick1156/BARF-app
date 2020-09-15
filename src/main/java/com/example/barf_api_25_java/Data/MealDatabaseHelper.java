@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.example.barf_api_25_java.Foods.Food;
 import com.example.barf_api_25_java.Foods.Meal;
 import com.example.barf_api_25_java.Foods.MealPlan;
+import com.example.barf_api_25_java.Settings.Settings;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -79,16 +80,52 @@ public class MealDatabaseHelper extends DataBaseHelper {
 
     public List<String> getMealDates(int dogId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        List<String> mealDates = new ArrayList<>();
+        List<String> mealDates;
 
         Cursor cursor = db.query(MEAL, new String[]{MEAL_DATE}, DOG_ID + "=" + dogId, null, null, null, MEAL_DATE + DESCENDING);
-        if (cursor.moveToFirst()) {
-            do {
-                mealDates.add(cursor.getString(0));
-            } while (cursor.moveToNext());
-        }
+        mealDates = getDatesFromCursor(cursor);
+
+        cursor.close();
         db.close();
         return mealDates;
+    }
+
+    public List<String> getRelevantMealDates(int dogId) {
+        List<String> mealDates;
+        Date today = Calendar.getInstance().getTime();
+        String stringToday = dateToString(today);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(MEAL, new String[]{MEAL_DATE}, DOG_ID + "=" + dogId + AND + MEAL_DATE + ">=" + "\'"+stringToday+"\'", null, null, null, MEAL_DATE + DESCENDING);
+        mealDates = getDatesFromCursor(cursor);
+
+        cursor.close();
+        db.close();
+        return mealDates;
+    }
+
+    public List<String> getArchiveMealDates(int dogId) {
+        List<String> mealDates;
+        Date today = Calendar.getInstance().getTime();
+        String stringToday = dateToString(today);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(MEAL, new String[]{MEAL_DATE}, DOG_ID + "=" + dogId + AND + MEAL_DATE + "<" + "\'"+stringToday+"\'", null, null, null, MEAL_DATE + DESCENDING);
+        mealDates = getDatesFromCursor(cursor);
+
+        cursor.close();
+        db.close();
+        return mealDates;
+    }
+
+    private List<String> getDatesFromCursor(Cursor cursor) {
+        List<String> result = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                result.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        return result;
     }
 
     private Date stringToDate(String date) throws ParseException {

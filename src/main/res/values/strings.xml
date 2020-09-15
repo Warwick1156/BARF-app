@@ -21,7 +21,7 @@
     <string name="NewMeal">New Meal</string>
     <string name="Archive">Archive</string>
     <string name="createMealPlan">How many meals to create?</string>
-    <string  name="Cancel">Cancel</string>
+    <string name="Cancel">Cancel</string>
     <string name="Ok">Ok</string>
     <string name="PickImage">Pick image</string>
 </resources>
