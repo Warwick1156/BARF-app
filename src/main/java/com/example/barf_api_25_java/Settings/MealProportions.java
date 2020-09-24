@@ -32,6 +32,11 @@ public class MealProportions {
     public float getMeat() { return proportions.get(FoodType.MEAT); }
     public float getBone() { return proportions.get(FoodType.BONE); }
     public float getOffal() { return proportions.get(FoodType.OFFAL); }
+
+    public void update(FoodType foodType, float value) {
+        proportions.remove(foodType);
+        proportions.put(foodType, value);
+    }
 }
 
 

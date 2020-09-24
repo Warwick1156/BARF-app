@@ -7,7 +7,6 @@ import com.example.barf_api_25_java.Data.SettingsDatabaseHelper;
 import com.example.barf_api_25_java.Foods.Food;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AllowedFoods {
@@ -27,7 +26,7 @@ public class AllowedFoods {
     }
 
     public void allowAll() {
-        List<Integer> foodIds = foodDatabaseHelper.getFoodsId();
+        List<Integer> foodIds = foodDatabaseHelper.getFoodsIds();
         for (int id : foodIds) {
             settingsDatabaseHelper.setAllowment(dogId, id, TRUE);
         }

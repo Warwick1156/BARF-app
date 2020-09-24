@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DogDatabaseHelper extends DataBaseHelper {
+    public static final String DOG = "DOG";
+    public static final String ID = "Id";
     public static final String NAME = "Name";
     public static final String AGE = "Age";
     public static final String WEIGHT = "Weight";
@@ -112,6 +114,14 @@ public class DogDatabaseHelper extends DataBaseHelper {
         db.update("DOG", cv, "Id=" + dogId, null);
 
         db.close();
+    }
+
+    public void updateActivity(int dogId, String activity) {
+        ContentValues cv = new ContentValues();
+        cv.put(ACTIVITY_TYPE, activity);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.update(DOG, cv, ID + "=" + dogId, null);
     }
 
 }

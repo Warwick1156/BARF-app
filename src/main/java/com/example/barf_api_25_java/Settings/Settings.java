@@ -5,6 +5,8 @@ import android.content.Context;
 import com.example.barf_api_25_java.Data.DataBaseHelper;
 import com.example.barf_api_25_java.Data.SettingsDatabaseHelper;
 import com.example.barf_api_25_java.Foods.Food;
+import com.example.barf_api_25_java.Types.ActivityType;
+import com.example.barf_api_25_java.Types.BreedType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,8 +52,12 @@ public class Settings {
         return settingsDatabaseHelper.getAllowedFoodsIds(dogId);
     }
 
-//    public void saveDefaultSettings(int dogId) {
-//        foodTargetWeight = new FoodTargetWeight();
-//    }
+    public void resetMealProportions() {
+        this.mealProportions = new MealProportions();
+    }
+
+    public void newTargetWeight(float weight, ActivityType activityType, BreedType breedType) {
+        this.foodTargetWeight = new FoodTargetWeight(weight, activityType, breedType);
+    }
 
 }

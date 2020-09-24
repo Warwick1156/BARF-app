@@ -31,11 +31,11 @@ public class AddDogActivity extends AppCompatActivity implements AdapterView.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_dog);
 
-        breedTypeSpinner = (Spinner) findViewById(R.id.spinner_BreedType);
+        breedTypeSpinner = findViewById(R.id.spinner_BreedType);
         ArrayAdapter<CharSequence> breedTypeAdapter = ArrayAdapter.createFromResource(this, R.array.breed_types, android.R.layout.simple_spinner_dropdown_item);
         breedTypeSpinner.setAdapter(breedTypeAdapter);
 
-        dogActivitySpinner = (Spinner) findViewById(R.id.spinner_ActivityType);
+        dogActivitySpinner = findViewById(R.id.spinner_ActivityType);
         ArrayAdapter<CharSequence> dogActivityAdapter = ArrayAdapter.createFromResource(this, R.array.dog_activity_type, android.R.layout.simple_spinner_dropdown_item);
         dogActivitySpinner.setAdapter(dogActivityAdapter);
 
@@ -59,7 +59,7 @@ public class AddDogActivity extends AppCompatActivity implements AdapterView.OnI
                     int dogId = dogDatabaseHelper.createDog(dog);
 
                     MealProportions mealProportions = new MealProportions();
-                    FoodTargetWeight foodTargetWeight = new FoodTargetWeight(dog.getWeight(), dog.getActivity());
+                    FoodTargetWeight foodTargetWeight = new FoodTargetWeight(dog.getWeight(), dog.getActivity(), dog.getBreedType());
                     Settings settings = new Settings(AddDogActivity.this, dogId, foodTargetWeight, mealProportions);
                     settings.allowedFoods.allowAll();
                     settings.saveSettings();

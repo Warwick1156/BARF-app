@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.barf_api_25_java.Activities.AddDog.AddDogActivity;
 import com.example.barf_api_25_java.Activities.DogTab.ArchiveMeals.ArchiveMealsActivity;
+import com.example.barf_api_25_java.Activities.DogTab.Settings.SettingsActivity;
 import com.example.barf_api_25_java.Activities.Main.MainActivity;
 import com.example.barf_api_25_java.Data.Dog;
 import com.example.barf_api_25_java.Data.DogDatabaseHelper;
@@ -143,6 +145,23 @@ public class DogMainTabActivity extends AppCompatActivity implements CreateMealP
             }
         });
 
+        ImageButton ibtnSettings = findViewById(R.id.ibtn_settings);
+        ibtnSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DogMainTabActivity.this, SettingsActivity.class);
+                intent.putExtra(DOG_ID, dog.getId());
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    public void onResume() {
+        super.onResume();
+        try {
+            settings = new Settings(DogMainTabActivity.this, dog.getId());
+        } catch (IOException e) {e.printStackTrace();}
     }
 
     public void createMealPlanDialog() {

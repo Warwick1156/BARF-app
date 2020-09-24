@@ -7,15 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import com.example.barf_api_25_java.Foods.Component;
-import com.example.barf_api_25_java.Foods.Food;
 import com.example.barf_api_25_java.Settings.FoodTargetWeight;
 import com.example.barf_api_25_java.Settings.MealProportions;
-import com.example.barf_api_25_java.Types.ComponentType;
-import com.example.barf_api_25_java.Types.FoodType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class SettingsDatabaseHelper extends DataBaseHelper {
@@ -123,7 +120,7 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
         return foodIds;
     }
 
-    private void deleteAllowedFoods(int dogId) {
+    private void deleteAllowedFoodsRecords(int dogId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(ALLOWED_FOODS, DOG_ID + "=" + dogId, null);
         db.close();
@@ -143,7 +140,43 @@ public class SettingsDatabaseHelper extends DataBaseHelper {
     public void deleteSettings(int dogId) {
         deleteFoodTargetWeight(dogId);
         deleteMealProportions(dogId);
-        deleteAllowedFoods(dogId);
+        deleteAllowedFoodsRecords(dogId);
     }
 
+    public HashMap<Integer, Boolean> getAllowedFoodMap(int dogId) {
+        HashMap<Integer, Boolean> allowedFoods = new HashMap<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(ALLOWED_FOODS, new String[]{FOOD_ID, ALLOWED}, DOG_ID + "=" + dogId, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                allowedFoods.put(cursor.getInt(0), cursor.getInt(1) > 0);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return allowedFoods;
+    }
+
+    public void setAllowment(int dogId, HashMap<Integer, Boolean> map) {
+        deleteAllowedFoodsRecords(dogId);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.beginTransaction();
+        try {
+            new ArrayList<Integer>(map.keySet()).forEach(foodId -> {
+                ContentValues cv = new ContentValues();
+                cv.put(DOG_ID, dogId);
+                cv.put(FOOD_ID, foodId);
+                cv.put(ALLOWED, map.get(foodId) ? 1 : 0);
+
+                db.insert(ALLOWED_FOODS, null, cv);
+            });
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        db.close();
+    }
 }

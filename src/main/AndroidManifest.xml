@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.DogTab.ArchiveMeals.ArchiveMealsActivity"></activity>
+        <activity android:name=".Activities.DogTab.Settings.AllowFoods.AllowFoodsActivity"></activity>
+        <activity android:name=".Activities.DogTab.Settings.SettingsActivity" />
+        <activity android:name=".Activities.DogTab.ArchiveMeals.ArchiveMealsActivity" />
         <activity android:name=".Activities.DogTab.DogMainTabActivity" />
         <activity android:name=".Activities.AddDog.AddDogActivity" />
         <activity

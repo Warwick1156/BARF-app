@@ -14,11 +14,16 @@ import com.example.barf_api_25_java.Types.FoodType;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class FoodDatabaseHelper extends DataBaseHelper {
     public static final String FOOD = "FOOD";
     public static final String ID = "Id";
+    public static final String ANIMAL = "Animal";
+    public static final String NAME = "Name";
+    public static final boolean DISTINCT = true;
+    public static final String AND = " AND ";
 
     public FoodDatabaseHelper(@Nullable Context context) throws IOException {
         super(context);
@@ -97,7 +102,7 @@ public class FoodDatabaseHelper extends DataBaseHelper {
         return food;
     }
 
-    public List<Integer> getFoodsId() {
+    public List<Integer> getFoodsIds() {
         List<Integer> ids = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -111,6 +116,57 @@ public class FoodDatabaseHelper extends DataBaseHelper {
         db.close();
 
         return ids;
+    }
+
+    public List<String> getAnimals() {
+        List<String> animals;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(DISTINCT, FOOD, new String[]{ANIMAL}, null, null, null, null, null, null);
+        animals = getSingleStringListFromCursor(cursor);
+        cursor.close();
+        db.close();
+
+        return animals;
+    }
+
+    public List<String> getNamesByAnimal(String animal) {
+        List<String> names;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(FOOD, new String[]{NAME}, ANIMAL + "=" + "'"+animal+"'", null, null, null, null);
+        names = getSingleStringListFromCursor(cursor);
+        cursor.close();
+        db.close();
+
+        return names;
+    }
+
+    public HashMap<Integer, String> getNamesAndIDsByAnimal(String animal) {
+        HashMap<Integer, String> map = new HashMap<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(FOOD, new String[]{NAME, ID}, ANIMAL + "=" + "'"+animal+"'", null, null, null, null);
+//        names = getSingleStringListFromCursor(cursor);
+        if (cursor.moveToFirst()) {
+            do {
+                map.put(cursor.getInt(1), cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return map;
+    }
+
+    private List<String> getSingleStringListFromCursor(Cursor cursor) {
+        List<String> result = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                result.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        return result;
     }
 
     private String[] idListToStringArray(List<Integer> ids) {
@@ -135,5 +191,15 @@ public class FoodDatabaseHelper extends DataBaseHelper {
             }
             return sb.toString();
         }
+    }
+
+    public int getId(String animal, String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(FOOD, new String[]{ID}, ANIMAL + "=" + "'"+animal+"'" + AND + NAME + "=" + "'"+name+"'", null, null, null, null);
+        cursor.moveToFirst();
+        int result = cursor.getInt(0);
+        cursor.close();
+        db.close();
+        return result;
     }
 }
