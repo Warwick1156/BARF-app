@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.DogTab.Settings.AllowFoods.AllowFoodsActivity"></activity>
+        <activity android:name=".Activities.DogTab.Settings.AllowFoods.AllowFoodsActivity"/>
         <activity android:name=".Activities.DogTab.Settings.SettingsActivity" />
         <activity android:name=".Activities.DogTab.ArchiveMeals.ArchiveMealsActivity" />
         <activity android:name=".Activities.DogTab.DogMainTabActivity" />
@@ -25,10 +25,38 @@
             </intent-filter>
         </activity>
         <activity android:name=".GalleryActivity" />
+
+        <service android:name=".Data.Sync.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <provider
+            android:authorities="com.example.barf_api_25_java.provider"
+            android:name=".Data.Sync.StubProvider"
+            android:exported="false"
+            android:syncable="true" />
+        <service
+            android:name=".Data.Sync.SyncService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter"/>
+        </service>
+
     </application>
+    
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
 </manifest>
