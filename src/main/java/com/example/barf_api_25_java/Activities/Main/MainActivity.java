@@ -1,10 +1,13 @@
 package com.example.barf_api_25_java.Activities.Main;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -31,15 +34,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,6 +61,7 @@ import static com.example.barf_api_25_java.Utils.ImageUtils.stringToBitmap;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_AUTHORIZATION = 10;
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
 
@@ -83,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        googleDriveTest();
 //        account = CreateSyncAccount(MainActivity.this);
 
         setContentView(R.layout.activity_main);
@@ -237,22 +249,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }*/
 
-    protected void onStart() {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+//    protected void onStart() {
+//        super.onStart();
+//            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+//
+//            if (account == null) {
+//                signIn();
+//            } else {
+//                mDriveServiceHelper = new DriveServiceHelper(getDriveService(account));
+//            }
+//            Task<String> createFileTask = mDriveServiceHelper.createFile();
+//            createFileTask.addOnCompleteListener(new OnCompleteListener<String>() {
+//                @Override
+//                public void onComplete(@NonNull Task<String> task) {
+////                    try {
+//                        String id = task.getResult();
+////                    } catch (UserRecoverableAuthIOException e) {
+////
+////                    }
+//                    System.out.println("Task completed");
+//                }
+//            });
+//    }
 
-        if (account == null) {
-            signIn();
-        } else {
-            mDriveServiceHelper = new DriveServiceHelper(getDriveService(account));
-        }
-        Task<String> id = mDriveServiceHelper.createFile();
-        Task<Pair<String, String>> read = mDriveServiceHelper.readFile(id.toString());
-        mDriveServiceHelper.createFilePickerIntent();
-        System.out.println(id);
-    }
-
-    private void signIn() {
+/*    private void signIn() {
 
         mGoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
@@ -315,6 +335,104 @@ public class MainActivity extends AppCompatActivity {
                 credential)
                 .setApplicationName("BarfApp")
                 .build();
+    }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*    protected void onStart() {
+        super.onStart();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        // Get the app's Drive folder
+        DriveResourceClient client = Drive.getDriveResourceClient(this, account);
+        client.getAppFolder().addOnCompleteListener(this, new OnCompleteListener<DriveFolder>() {
+            @Override
+            public void onComplete(@NonNull Task<DriveFolder> task) {
+                System.out.println("Test");
+            }
+        });
+
+    }*/
+
+    protected void googleDriveTest() {
+        String token = "924077573187-fujbsfce8au1sfaum4gr3qkdl9u1h3v0.apps.googleusercontent.com";
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(token)
+                .requestScopes(Drive.SCOPE_FILE, Drive.SCOPE_APPFOLDER)
+                .build();
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+//        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+
+        // This account must have the necessary scopes to make the API call
+        //   See https://developers.google.com/identity/sign-in/android/
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+//        GoogleSignInAccount account = ;
+//        GoogleSignIn.requestPermissions(this, 0, account, Drive.SCOPE_FILE);
+      // Get the app's Drive folder
+        DriveResourceClient client = Drive.getDriveResourceClient(this, account);
+        client.getAppFolder().addOnCompleteListener(this, new OnCompleteListener<DriveFolder>() {
+
+            @Override
+            public void onComplete(@NonNull Task<DriveFolder> task) {
+
+            }
+        });
+//        OAuth2();
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
+                }
+//                handleSignInResult(resultData);
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+    private void handleSignInResult(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount account) {
+                        DriveResourceClient client = Drive.getDriveResourceClient(MainActivity.this, account);
+                        client.getAppFolder().addOnCompleteListener(MainActivity.this, new OnCompleteListener<DriveFolder>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DriveFolder> task) {
+
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Unable to sign in.", e);
+                    }
+                });
+    }
+
+/*    private void OAuth2() {
+        Credential credential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(TasksScopes.TASKS));
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        credential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        service = new com.google.api.services.tasks.Tasks.Builder(httpTransport, jsonFactory, credential)
+                        .setApplicationName("BarfApp").build();
+    }*/
 }
