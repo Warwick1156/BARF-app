@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DogMainTabActivity">
+    tools:context=".Activities.DogTab.DogMainTabActivity">
 
     <Button
         android:id="@+id/btn_changeImage"
@@ -41,8 +41,9 @@
     <ExpandableListView
         android:id="@+id/mealListView"
         android:layout_width="match_parent"
-        android:layout_height="1500px"
-        android:layout_marginTop="24dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="265dp"
+        android:transcriptMode="alwaysScroll"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.5dp"
         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
@@ -54,7 +55,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/btn_star"
+        app:srcCompat="@drawable/settings_ico"
         tools:srcCompat="@drawable/settings_ico" />
 
     <ImageView

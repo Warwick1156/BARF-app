@@ -9,16 +9,34 @@ public class MealProportions {
 
     public MealProportions() {
         this.proportions = new EnumMap<FoodType, Float>(FoodType.class);
-        proportions.put(FoodType.MEAT, new Float(0.6));
-        proportions.put(FoodType.OFFAL, new Float(0.25));
-        proportions.put(FoodType.BONE, new Float(0.15));
+        proportions.put(FoodType.MEAT, (float) 0.6);
+        proportions.put(FoodType.OFFAL, (float) 0.25);
+        proportions.put(FoodType.BONE, (float) 0.15);
     }
 
     public MealProportions(EnumMap<FoodType, Float> proportions) {
         this.proportions = proportions;
     }
 
+    public MealProportions(float meat, float bones, float offal) {
+        this.proportions = new EnumMap<FoodType, Float>(FoodType.class);
+        proportions.put(FoodType.MEAT, meat);
+        proportions.put(FoodType.BONE, bones);
+        proportions.put(FoodType.OFFAL, offal);
+    }
+
     public EnumMap<FoodType, Float> getProportions() {
         return proportions;
     }
+
+    public float getMeat() { return proportions.get(FoodType.MEAT); }
+    public float getBone() { return proportions.get(FoodType.BONE); }
+    public float getOffal() { return proportions.get(FoodType.OFFAL); }
+
+    public void update(FoodType foodType, float value) {
+        proportions.remove(foodType);
+        proportions.put(foodType, value);
+    }
 }
+
+

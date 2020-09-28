@@ -1,4 +1,4 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.DogTab;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,17 +10,25 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.example.barf_api_25_java.R;
+
 public class MealListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
-    private List<String> expandableListTitle;
-    private HashMap<String, List<String>> expandableListDetail;
+    protected Context context;
+    protected List<String> expandableListTitle;
+    protected HashMap<String, List<String>> expandableListDetail;
 
     public MealListAdapter(Context context, List<String> expandableListTitle,
                                        HashMap<String, List<String>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
         this.expandableListDetail = expandableListDetail;
+    }
+
+    public void changeDataSet(List<String> listDataHeader, HashMap<String, List<String>> listChildData) {
+        this.expandableListTitle = listDataHeader;
+        this.expandableListDetail = listChildData;
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -71,8 +79,7 @@ public class MealListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int listPosition, boolean isExpanded,
-                             View convertView, ViewGroup parent) {
+    public View getGroupView(int listPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String listTitle = (String) getGroup(listPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.

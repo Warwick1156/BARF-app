@@ -1,45 +1,65 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.Main;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
-import com.example.barf_api_25_java.Data.DataBaseHelper;
-import com.example.barf_api_25_java.Data.Dog;
-import com.example.barf_api_25_java.Data.DogDatabaseHelper;
-import com.example.barf_api_25_java.Foods.Food;
-import com.example.barf_api_25_java.Foods.Meal;
-import com.example.barf_api_25_java.Foods.MealPlan;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.AdapterView;
+import com.example.barf_api_25_java.Activities.AddDog.AddDogActivity;
+import com.example.barf_api_25_java.Data.DataBaseHelper;
+import com.example.barf_api_25_java.Data.Dog;
+import com.example.barf_api_25_java.Data.DogDatabaseHelper;
+import com.example.barf_api_25_java.Data.MealDatabaseHelper;
+import com.example.barf_api_25_java.Data.SettingsDatabaseHelper;
+import com.example.barf_api_25_java.Data.Sync.DriveServiceHelper;
+import com.example.barf_api_25_java.Data.Sync.GoogleDriveFileHolder;
+import com.example.barf_api_25_java.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
+//import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.example.barf_api_25_java.Utils.ImageUtils.stringToBitmap;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_AUTHORIZATION = 10;
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
 
@@ -51,11 +71,22 @@ public class MainActivity extends AppCompatActivity {
     RecyclerViewAdapter dogsViewAdapter;
 
     DogDatabaseHelper dogDatabaseHelper;
+    SettingsDatabaseHelper settingsDatabaseHelper;
+    MealDatabaseHelper mealDatabaseHelper;
+
+    private static final int REQUEST_CODE_SIGN_IN = 100;
+    private GoogleSignInClient mGoogleSignInClient;
+    private DriveServiceHelper mDriveServiceHelper;
+    private static final String TAG = "MainActivity";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        googleDriveTest();
+//        account = CreateSyncAccount(MainActivity.this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -64,34 +95,17 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
                 Intent intent = new Intent(MainActivity.this, AddDogActivity.class);
                 startActivity(intent);
             }
         });
 
         try {
+            DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
             initDogsView();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-            List<Food> foodList = dataBaseHelper.getFoods("", "");
-            //Meal meal = new Meal(600);
-            //meal.createMeal(foodList);
-            MealPlan mealPlan = new MealPlan(7, 600, foodList);
-            mealPlan.createMealPlan();
-            List<Meal> mealList = mealPlan.getMealList();
-            System.out.println("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public void onResume() {
@@ -132,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Dog> loadDogs() throws IOException {
         List<Dog> dogs = new ArrayList<>();
         try {
+            settingsDatabaseHelper = new SettingsDatabaseHelper(MainActivity.this);
+            mealDatabaseHelper = new MealDatabaseHelper(MainActivity.this);
             dogDatabaseHelper = new DogDatabaseHelper(MainActivity.this);
             dogs = dogDatabaseHelper.getDogs(null);
         } catch (Exception e) {
@@ -158,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
         int databaseId = dogsViewAdapter.getItemDatabaseId();
 
         dogDatabaseHelper.removeDogById(databaseId);
+        settingsDatabaseHelper.deleteSettings(databaseId);
+        mealDatabaseHelper.deleteMealPlan(databaseId);
+
         dogsViewAdapter.removeItem(position);
         dogsViewAdapter.notifyItemRemoved(position);
         dogsViewAdapter.notifyItemRangeChanged(position, dogsViewAdapter.getItemCount());
@@ -191,6 +210,59 @@ public class MainActivity extends AppCompatActivity {
         return byteArrayOutputStream.toByteArray();
     }
 
+    private void googleDriveTest() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        signIn();
+    }
 
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, REQUEST_AUTHORIZATION);
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == REQUEST_AUTHORIZATION) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            mDriveServiceHelper = new DriveServiceHelper(getDriveService(account));
+            Task<GoogleDriveFileHolder> task =  mDriveServiceHelper.buckUpDatabase();
+            task.addOnCompleteListener(new OnCompleteListener<GoogleDriveFileHolder>() {
+                @Override
+                public void onComplete(@NonNull Task<GoogleDriveFileHolder> task) {
+                    Log.w(TAG, "Database bucked up");
+                }
+            });
+        } catch (ApiException e) {
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+    private Drive getDriveService(GoogleSignInAccount account) {
+        GoogleAccountCredential credential = GoogleAccountCredential
+                .usingOAuth2(getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
+        credential.setSelectedAccount(account.getAccount());
+        return new Drive.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new GsonFactory(),
+                credential)
+                .setApplicationName("BarfApp")
+                .build();
+    }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BARF_API_25_java</string>
+    <string name="app_name">BarfApp</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -21,7 +21,35 @@
     <string name="NewMeal">New Meal</string>
     <string name="Archive">Archive</string>
     <string name="createMealPlan">How many meals to create?</string>
-    <string  name="Cancel">Cancel</string>
-    <string name="Ok">Ok</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Ok">OK</string>
     <string name="PickImage">Pick image</string>
+    <string name="title_activity_settings2">SettingsActivity2</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="Save">Save</string>
+    <string name="Edit">Edit</string>
+    <string name="AllowedFoods">Allowed foods:</string>
+    <string name="TargetWeight">Meal weight:</string>
+    <string name="MealProportions">Meal proportions:</string>
+    <string name="Meat">Meat</string>
+    <string name="Offal">Offal</string>
+    <string name="Bone">Bone</string>
+    <string name="g">g</string>
+    <string name="Reset">Reset</string>
+    <string name="Recalculate">Recalculate</string>
+    <string name="AppName">BarfApp</string>
 </resources>

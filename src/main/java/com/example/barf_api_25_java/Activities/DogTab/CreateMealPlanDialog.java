@@ -1,4 +1,4 @@
-package com.example.barf_api_25_java;
+package com.example.barf_api_25_java.Activities.DogTab;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,10 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.example.barf_api_25_java.R;
+
+import java.text.ParseException;
 
 public class CreateMealPlanDialog extends AppCompatDialogFragment {
     Spinner mealsNoSpinner;
@@ -36,7 +40,11 @@ public class CreateMealPlanDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int mealsNo = Integer.parseInt(mealsNoSpinner.getSelectedItem().toString());
-                        listener.newMealPlan(mealsNo);
+                        try {
+                            listener.newMealPlan(mealsNo);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -58,6 +66,6 @@ public class CreateMealPlanDialog extends AppCompatDialogFragment {
     }
 
     public interface CreateMealPlanListener {
-        void newMealPlan(int mealsNo);
+        void newMealPlan(int mealsNo) throws ParseException;
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Food {
 
+    private int id;
     private String name;
     private String animal;
     private FoodType category;
@@ -13,7 +14,8 @@ public class Food {
     private float bones;
     private List<Component> componentList;
 
-    public Food(String name, String animal, FoodType category, float portion, float bones, List<Component> componentList) {
+    public Food(int id, String name, String animal, FoodType category, float portion, float bones, List<Component> componentList) {
+        this.id = id;
         this.name = name;
         this.animal = animal;
         this.category = category;
@@ -21,6 +23,8 @@ public class Food {
         this.bones = bones;
         this.componentList = componentList;
     }
+
+    public Food(){};
 
     public FoodType getCategory() {
         return category;
@@ -45,4 +49,6 @@ public class Food {
     public String getAnimal() {
         return animal;
     }
+
+    public int getId() { return id; }
 }
