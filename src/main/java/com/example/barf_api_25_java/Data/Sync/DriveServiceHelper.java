@@ -17,9 +17,11 @@
 package com.example.barf_api_25_java.Data.Sync;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.util.Pair;
 
@@ -33,6 +35,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -229,4 +232,17 @@ public class DriveServiceHelper {
             }
         });
     }
+
+    public Task<GoogleDriveFileHolder> buckUpDatabase() {
+        String devicePath = "/data/data/com.example.barf_api_25_java/databases/";
+        String databaseName = "barf.db";
+        java.io.File dbFile = new java.io.File(devicePath + databaseName);
+        Task uploadTask = null;
+
+        if (dbFile.exists()) {
+            uploadTask = uploadFile(dbFile, "application/vnd.google-apps.unknown", null);
+        }
+        return uploadTask;
+    }
+
 }
